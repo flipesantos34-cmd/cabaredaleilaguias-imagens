@@ -144,7 +144,8 @@ def main():
 
     # Giro: vendas em relação ao estoque disponível.
     base = sold_day if sold_day is not None else {k: v[3] for k, v in regular.items()}
-    turnover = {k: base.get(k, 0) / max(1, v[2]) for k, v in regular.items() if base.get(k, 0) > 0}
+    # Só itens com estoque: dividir por zero inflaria o giro dos esgotados.
+    turnover = {k: base.get(k, 0) / v[2] for k, v in regular.items() if base.get(k, 0) > 0 and v[2] > 0}
     trending = [entry(k, regular[k], turnover=round(turnover[k], 1)) for k in sorted(turnover, key=turnover.get, reverse=True)[:TOP]]
 
     # Altas de preço: histórico dos itens mais negociados (os mais líquidos).
